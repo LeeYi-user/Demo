@@ -7,7 +7,7 @@ export async function handler(_req: Request, ctx: HandlerContext) {
     return await ctx.render(hostname);
 }
 
-export default function Chat(props: PageProps) {
+export default function Chat({ url, data }: PageProps) {
     return (
         <>
             <Head>
@@ -15,8 +15,8 @@ export default function Chat(props: PageProps) {
             </Head>
 
             <div class="mt-4 ml-4">
-                <ChatArea address={ props.data }/>
+                <ChatArea url={ url.origin } address={ data }/>
             </div>
         </>
-    )
+    );
 }

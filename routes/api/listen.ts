@@ -18,14 +18,14 @@ export const handler: Handlers = {
                 channel.close();
             }
         });
-    
+
         return new Response(stream.pipeThrough(new TextEncoderStream()),
         {
             headers: { "content-type": "text/event-stream" }
         });
     }
-}
+};
 
 export const config: RouteConfig = {
-    routeOverride: "/api/listen/:channel",
+    routeOverride: "/api/listen/:channel"
 };

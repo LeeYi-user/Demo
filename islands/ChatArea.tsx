@@ -1,11 +1,24 @@
-import { useState, useEffect, useRef } from "preact/hooks"
+import { useState, useEffect, useRef } from "preact/hooks";
 
-export default function ChatArea({ address }: { address: string}) {
+interface Props
+{
+    "url": string;
+    "address": string;
+}
+
+interface Message
+{
+    "channel": string;
+    "address": string;
+    "content": string;
+}
+
+export default function ChatArea({ url, address }: Props ) {
     const channelBox = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<string>("default");
 
     const messageBox = useRef<HTMLInputElement>(null);
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
 
     // deno-lint-ignore no-explicit-any
     function setting(event: any)
@@ -13,10 +26,14 @@ export default function ChatArea({ address }: { address: string}) {
         if (event.key === "Enter" || event.target.nodeName === "BUTTON")
         {
             setChannel(channelBox.current?.value || "default");
-            setMessages([]);
             channelBox.current!.value = "";
         }
     }
+
+    useEffect(() =>
+    {
+        fetch(`${ url }/api/load/${ channel }`).then((value) => value.json().then((value) => setMessages(value)));
+    }, [channel]);
 
     // deno-lint-ignore no-explicit-any
     function typing(event: any)
@@ -30,8 +47,8 @@ export default function ChatArea({ address }: { address: string}) {
                 {
                     "channel": channel,
                     "address": address,
-                    "message": messageBox.current?.value
-                })
+                    "content": messageBox.current?.value
+                } as Message)
             });
 
             messageBox.current!.value = "";
@@ -44,13 +61,13 @@ export default function ChatArea({ address }: { address: string}) {
 
         events.addEventListener("message", (event) =>
         {
-            setMessages((messages) => [...messages, JSON.parse(event.data).address + ": " + JSON.parse(event.data).message]);
+            setMessages((messages) => [...messages, JSON.parse(event.data)]);
         });
 
-        return () =>
+        return (() =>
         {
             events.close();
-        }
+        });
     }, [channel]);
 
     return (
@@ -69,8 +86,8 @@ export default function ChatArea({ address }: { address: string}) {
 
             <div class="mt-1">
                 { messages.map((message) => { return (
-                    <p>{ message }</p>
-                ) }) }
+                    <p>{ message.address }: { message.content }</p>
+                ); }) }
             </div>
         </div>
     );

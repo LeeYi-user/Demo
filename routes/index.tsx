@@ -12,5 +12,5 @@ export default function Home() {
                 <Link>chat</Link>
             </div>
         </>
-    )
+    );
 }
