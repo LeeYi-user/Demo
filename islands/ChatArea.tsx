@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
+import Button from "../components/Button.tsx";
 
 interface Props
 {
@@ -14,10 +15,10 @@ interface Message
 }
 
 export default function ChatArea({ url, address }: Props ) {
-    const channelBox = useRef<HTMLInputElement>(null);
+    const channelInput = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<string>("default");
 
-    const messageBox = useRef<HTMLInputElement>(null);
+    const messageInput = useRef<HTMLInputElement>(null);
     const [messages, setMessages] = useState<Message[]>([]);
 
     // deno-lint-ignore no-explicit-any
@@ -25,8 +26,8 @@ export default function ChatArea({ url, address }: Props ) {
     {
         if (event.key === "Enter" || event.target.nodeName === "BUTTON")
         {
-            setChannel(channelBox.current?.value || "default");
-            channelBox.current!.value = "";
+            setChannel(channelInput.current?.value || "default");
+            channelInput.current!.value = "";
         }
     }
 
@@ -47,11 +48,11 @@ export default function ChatArea({ url, address }: Props ) {
                 {
                     "channel": channel,
                     "address": address,
-                    "content": messageBox.current?.value
+                    "content": messageInput.current?.value
                 } as Message)
             });
 
-            messageBox.current!.value = "";
+            messageInput.current!.value = "";
         }
     }
 
@@ -75,13 +76,13 @@ export default function ChatArea({ url, address }: Props ) {
             Current channel: { channel }
 
             <div class="mt-1">
-                <input type="text" class="p-1 w-48 h-8 border border-black" placeholder="Channel" ref={ channelBox } onKeyDown={ setting }/>
-                <button class="ml-1 h-8 border border-black" onClick={ setting }>Enter</button>
+                <input type="text" class="p-1 w-48 h-8 border border-black" placeholder="Channel" ref={ channelInput } onKeyDown={ setting }/>
+                <Button class="ml-1" onClick={ setting }>Enter</Button>
             </div>
 
             <div class="mt-1">
-                <input type="text" class="p-1 w-48 h-8 border border-black" placeholder="Message" ref={ messageBox } onKeyDown={ typing }/>
-                <button class="ml-1 h-8 border border-black" onClick={ typing }>Enter</button>
+                <input type="text" class="p-1 w-48 h-8 border border-black" placeholder="Message" ref={ messageInput } onKeyDown={ typing }/>
+                <Button class="ml-1" onClick={ typing }>Enter</Button>
             </div>
 
             <div class="mt-1">

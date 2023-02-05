@@ -3,23 +3,33 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import config from "./deno.json" assert { type: "json" };
-import * as $0 from "./routes/api/listen.ts";
-import * as $1 from "./routes/api/load.ts";
-import * as $2 from "./routes/api/send.ts";
-import * as $3 from "./routes/chat.tsx";
-import * as $4 from "./routes/index.tsx";
+import * as $0 from "./routes/api/download.ts";
+import * as $1 from "./routes/api/listen.ts";
+import * as $2 from "./routes/api/load.ts";
+import * as $3 from "./routes/api/send.ts";
+import * as $4 from "./routes/api/upload.ts";
+import * as $5 from "./routes/chat.tsx";
+import * as $6 from "./routes/download.tsx";
+import * as $7 from "./routes/index.tsx";
+import * as $8 from "./routes/upload.tsx";
 import * as $$0 from "./islands/ChatArea.tsx";
+import * as $$1 from "./islands/UploadArea.tsx";
 
 const manifest = {
   routes: {
-    "./routes/api/listen.ts": $0,
-    "./routes/api/load.ts": $1,
-    "./routes/api/send.ts": $2,
-    "./routes/chat.tsx": $3,
-    "./routes/index.tsx": $4,
+    "./routes/api/download.ts": $0,
+    "./routes/api/listen.ts": $1,
+    "./routes/api/load.ts": $2,
+    "./routes/api/send.ts": $3,
+    "./routes/api/upload.ts": $4,
+    "./routes/chat.tsx": $5,
+    "./routes/download.tsx": $6,
+    "./routes/index.tsx": $7,
+    "./routes/upload.tsx": $8,
   },
   islands: {
     "./islands/ChatArea.tsx": $$0,
+    "./islands/UploadArea.tsx": $$1,
   },
   baseUrl: import.meta.url,
   config,

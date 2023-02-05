@@ -15,7 +15,8 @@ const db = client.database("demo");
 
 export const handler: Handlers = {
     async GET(_req, ctx) {
-        return new Response(JSON.stringify(await db.collection<Message>("chat").find({ "channel": ctx.params.channel }, { "projection": { "_id": false } }).toArray()));
+        const messages = await db.collection<Message>("chat").find({ "channel": ctx.params.channel }, { "projection": { "_id": false } }).toArray();
+        return new Response(JSON.stringify(messages));
     }
 };
 
