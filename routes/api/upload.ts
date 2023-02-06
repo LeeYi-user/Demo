@@ -9,10 +9,9 @@ const db = client.database("demo");
 export const handler: Handlers = {
     async POST(req, _ctx) {
         const body = await req.formData();
-        const file = body.get("file") as File;
         const reader = new FileReader();
 
-        reader.readAsArrayBuffer(file);
+        reader.readAsArrayBuffer(body.get("data") as File);
 
         reader.onload = async function ()
         {
@@ -20,7 +19,7 @@ export const handler: Handlers = {
             const fileContent = new Uint8Array(arrayBuffer as ArrayBuffer);
 
             const bucket = new GridFSBucket(db);
-            const upstream = bucket.openUploadStream(file.name);
+            const upstream = bucket.openUploadStream(body.get("name") as string);
 
             const writer = (await upstream).getWriter();
             writer.write(fileContent);

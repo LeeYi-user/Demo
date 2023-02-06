@@ -10,7 +10,8 @@ export default function UploadArea()
         const file = fileInput.current!.files![0];
         const formData = new FormData();
 
-        formData.append("file", file);
+        formData.append("name", file.name);
+        formData.append("data", file);
 
         await fetch("/api/upload",
         {
