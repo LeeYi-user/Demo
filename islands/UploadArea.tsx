@@ -5,30 +5,20 @@ export default function UploadArea()
 {
     const fileInput = useRef<HTMLInputElement>(null);
 
-    function submit()
+    async function submit()
     {
-        const reader = new FileReader();
         const file = fileInput.current!.files![0];
+        const formData = new FormData();
 
-        reader.readAsArrayBuffer(file);
+        formData.append("file", file);
 
-        reader.onload = async function()
+        await fetch("/api/upload",
         {
-            const arrayBuffer = this.result;
-            const array = new Uint8Array(arrayBuffer as ArrayBufferLike);
+            method: "POST",
+            body: formData
+        });
 
-            await fetch("/api/upload",
-            {
-                method: "POST",
-                body: JSON.stringify(
-                {
-                    "name": file.name,
-                    "data": array
-                })
-            });
-
-            fileInput.current!.value = "";
-        }
+        fileInput.current!.value = "";
     }
 
     return (

@@ -8,14 +8,25 @@ const db = client.database("demo");
 
 export const handler: Handlers = {
     async POST(req, _ctx) {
-        const body = await req.json();
-        const bucket = new GridFSBucket(db);
-        const upstream = bucket.openUploadStream(body.name);
+        const body = await req.formData();
+        const file = body.get("file") as File;
+        const reader = new FileReader();
 
-        const writer = (await upstream).getWriter();
-        writer.write(new Uint8Array([...Object.values(body.data as JSON)]));
+        reader.readAsArrayBuffer(file);
 
-        await writer.close();
+        reader.onload = async function ()
+        {
+            const arrayBuffer = this.result;
+            const fileContent = new Uint8Array(arrayBuffer as ArrayBuffer);
+
+            const bucket = new GridFSBucket(db);
+            const upstream = bucket.openUploadStream(file.name);
+
+            const writer = (await upstream).getWriter();
+            writer.write(fileContent);
+
+            await writer.close();
+        }
 
         return new Response("OK");
     }
