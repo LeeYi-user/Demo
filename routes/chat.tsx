@@ -15,7 +15,7 @@ export default function Chat({ url, data }: PageProps) {
             </Head>
 
             <div class="mt-4 ml-4">
-                <ChatArea url={ url.origin } address={ data }/>
+                <ChatArea address={ data }/>
             </div>
         </>
     );

@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "preact/hooks";
+import { useState, useEffect, useRef, useCallback } from "preact/hooks";
 import Button from "../components/Button.tsx";
 
-export default function CallArea()
+export default function CallArea({ id }: { "id": string })
 {
     const ICE_SERVERS: RTCConfiguration =
     {
@@ -15,14 +15,13 @@ export default function CallArea()
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
     const [pc, setPc] = useState<RTCPeerConnection>();
-    const [id, setId] = useState<string>();
+    const [socket, setSocket] = useState<WebSocket | null>(null);
 
     useEffect(() =>
     {
         navigator.mediaDevices.getUserMedia({ "video": true, "audio": true }).then((value) => setLocalStream(value))
         setRemoteStream(new MediaStream());
         setPc(new RTCPeerConnection(ICE_SERVERS));
-        setId(Math.random().toString(36).substring(2, 9));
     }, []);
 
     const localVideo = useRef<HTMLVideoElement>(null);
@@ -50,20 +49,16 @@ export default function CallArea()
         remoteVideo.current!.srcObject = remoteStream;
     }
 
-    async function startCall()
+    const startCall = useCallback(async () =>
     {
-        pc!.onicecandidate = async (event) =>
+        pc!.onicecandidate = (event) =>
         {
-            await fetch("/api/signaling",
+            socket?.send(JSON.stringify(
             {
-                method: "POST",
-                body: JSON.stringify(
-                {
-                    "id": id,
-                    "type": "candidate",
-                    "data": event.candidate?.toJSON()
-                })
-            });
+                "id": id,
+                "type": "candidate",
+                "data": event.candidate?.toJSON()
+            }));
 
             consoleLog.current!.innerHTML += "<p>send candidate</p>";
         }
@@ -79,49 +74,55 @@ export default function CallArea()
             "sdp": offerDescription?.sdp
         };
 
-        await fetch("/api/signaling",
+        socket?.send(JSON.stringify(
         {
-            method: "POST",
-            body: JSON.stringify(
-            {
-                "id": id,
-                "type": "offer",
-                "data": offer
-            })
-        });
+            "id": id,
+            "type": "offer",
+            "data": offer
+        }));
 
         consoleLog.current!.innerHTML += "<p>send offer</p>";
-    }
+    }, [socket]);
 
     useEffect(() =>
     {
-        const events = new EventSource("/api/listen/signaling");
+        if (!localStream)
+        {
+            return;
+        }
 
-        events.addEventListener("message", async (event) =>
+        const protocol = (location.protocol === "http:") ? "ws:" : "wss:";
+        const socket = new WebSocket(`${ protocol }//${ location.host }/api/ws`);
+
+        socket.onopen = () =>
+        {
+            socket.send(JSON.stringify(
+            {
+                "id": id,
+                "type": "join"
+            }));
+        };
+
+        socket.onmessage = async (event) =>
         {
             const body = JSON.parse(event.data);
 
-            if (body.id === id)
+            if (body.type === "join")
             {
-                return;
+                consoleLog.current!.innerHTML += `<p>new peer: ${ body.id }</p>`;
             }
-
-            if (body.type === "offer")
+            else if (body.type === "offer")
             {
                 consoleLog.current!.innerHTML += "<p>receive offer<p/>";
 
-                pc!.onicecandidate = async (event) =>
+                pc!.onicecandidate = (event) =>
                 {
-                    await fetch("/api/signaling",
+                    socket.send(JSON.stringify(
                     {
-                        method: "POST",
-                        body: JSON.stringify(
-                        {
-                            "id": id,
-                            "type": "candidate",
-                            "data": event.candidate?.toJSON()
-                        })
-                    });
+                        "id": id,
+                        "type": "candidate",
+                        "data": event.candidate?.toJSON()
+                    }));
 
                     consoleLog.current!.innerHTML += "<p>send candidate</p>";
                 }
@@ -129,10 +130,12 @@ export default function CallArea()
                 const offerDescription = new RTCSessionDescription(body.data);
                 pc?.setRemoteDescription(offerDescription);
 
+                consoleLog.current!.innerHTML += "<p>set remote description</p>";
+
                 const answerDescription = await pc?.createAnswer();
                 await pc?.setLocalDescription(answerDescription);
 
-                consoleLog.current!.innerHTML += "<p>set local/remote description</p>";
+                consoleLog.current!.innerHTML += "<p>set local description</p>";
 
                 const answer =
                 {
@@ -140,16 +143,12 @@ export default function CallArea()
                     "sdp": answerDescription?.sdp,
                 };
 
-                await fetch("/api/signaling",
+                socket.send(JSON.stringify(
                 {
-                    method: "POST",
-                    body: JSON.stringify(
-                    {
-                        "id": id,
-                        "type": "answer",
-                        "data": answer
-                    })
-                });
+                    "id": id,
+                    "type": "answer",
+                    "data": answer
+                }));
 
                 consoleLog.current!.innerHTML += "<p>send answer</p>";
             }
@@ -171,12 +170,9 @@ export default function CallArea()
 
                 consoleLog.current!.innerHTML += "<p>add candidate</p>";
             }
-        });
+        };
 
-        return (() =>
-        {
-            events.close();
-        });
+        setSocket(socket);
     }, [localStream]);
 
     return (

@@ -1,7 +1,13 @@
+import { HandlerContext, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import CallArea from "../islands/CallArea.tsx";
 
-export default function Call() {
+export async function handler(_req: Request, ctx: HandlerContext) {
+    const id = Math.random().toString(36).substring(2, 9);
+    return await ctx.render(id);
+}
+
+export default function Call({ url, data }: PageProps) {
     return (
         <>
             <Head>
@@ -9,7 +15,7 @@ export default function Call() {
             </Head>
 
             <div class="mt-4 ml-4">
-                <CallArea/>
+                <CallArea id={ data }/>
             </div>
         </>
     );

@@ -1,12 +1,6 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 import Button from "../components/Button.tsx";
 
-interface Props
-{
-    "url": string;
-    "address": string;
-}
-
 interface Message
 {
     "channel": string;
@@ -14,7 +8,7 @@ interface Message
     "content": string;
 }
 
-export default function ChatArea({ url, address }: Props ) {
+export default function ChatArea({ address }: { "address": string }) {
     const channelInput = useRef<HTMLInputElement>(null);
     const [channel, setChannel] = useState<string>("default");
 
@@ -33,7 +27,7 @@ export default function ChatArea({ url, address }: Props ) {
 
     useEffect(() =>
     {
-        fetch(`${ url }/api/load/${ channel }`).then((value) => value.json().then((value) => setMessages(value)));
+        fetch(`${ location.protocol }//${ location.host }/api/load/${ channel }`).then((value) => value.json().then((value) => setMessages(value)));
     }, [channel]);
 
     // deno-lint-ignore no-explicit-any

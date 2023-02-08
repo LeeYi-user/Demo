@@ -7,8 +7,8 @@ import * as $0 from "./routes/api/download.ts";
 import * as $1 from "./routes/api/listen.ts";
 import * as $2 from "./routes/api/load.ts";
 import * as $3 from "./routes/api/send.ts";
-import * as $4 from "./routes/api/signaling.ts";
-import * as $5 from "./routes/api/upload.ts";
+import * as $4 from "./routes/api/upload.ts";
+import * as $5 from "./routes/api/ws.ts";
 import * as $6 from "./routes/call.tsx";
 import * as $7 from "./routes/chat.tsx";
 import * as $8 from "./routes/download.tsx";
@@ -24,8 +24,8 @@ const manifest = {
     "./routes/api/listen.ts": $1,
     "./routes/api/load.ts": $2,
     "./routes/api/send.ts": $3,
-    "./routes/api/signaling.ts": $4,
-    "./routes/api/upload.ts": $5,
+    "./routes/api/upload.ts": $4,
+    "./routes/api/ws.ts": $5,
     "./routes/call.tsx": $6,
     "./routes/chat.tsx": $7,
     "./routes/download.tsx": $8,
