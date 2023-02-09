@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "preact/hooks";
-import Button from "../components/Button.tsx";
+import { Button } from "../components/Button.tsx";
 
 interface Message
 {
@@ -80,9 +80,14 @@ export default function ChatArea({ address }: { "address": string }) {
             </div>
 
             <div class="mt-1">
-                { messages.map((message) => { return (
-                    <p>{ message.address }: { message.content }</p>
-                ); }) }
+                {
+                    messages.map((message) =>
+                    {
+                        return (
+                            <p>{ message.address }: { message.content }</p>
+                        );
+                    })
+                }
             </div>
         </div>
     );

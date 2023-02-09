@@ -1,7 +1,7 @@
 import { HandlerContext, PageProps } from "$fresh/server.ts";
 import { Head } from "$fresh/runtime.ts";
 import { MongoClient, ObjectId } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
-import Link from "../components/Link.tsx";
+import { Link } from "../components/Link.tsx";
 import "https://deno.land/x/dotenv@v3.2.0/load.ts";
 
 const client = new MongoClient();
@@ -22,9 +22,14 @@ export default function Download({ url, data }: PageProps) {
             </Head>
 
             <div class="mt-4 ml-4">
-                { data.map((file: { "_id": ObjectId; "filename": string }) => { return (
-                    <Link href={ `/api/download/${ file._id.toString() }` }>{ file.filename }</Link>
-                ); }) }
+                {
+                    data.map((file: { "_id": ObjectId; "filename": string }) =>
+                    {
+                        return (
+                            <Link href={ `/api/download/${ file._id.toString() }` }>{ file.filename }</Link>
+                        );
+                    })
+                }
             </div>
         </>
     );

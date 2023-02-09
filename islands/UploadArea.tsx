@@ -1,5 +1,5 @@
 import { useRef } from "preact/hooks";
-import Button from "../components/Button.tsx";
+import { Button } from "../components/Button.tsx";
 
 export default function UploadArea()
 {

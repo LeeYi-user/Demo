@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import Link from "../components/Link.tsx";
+import { Link } from "../components/Link.tsx";
 
 export default function Home() {
     return (

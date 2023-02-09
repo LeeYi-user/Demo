@@ -1,10 +1,10 @@
 import { JSX } from "preact";
 
-export default function Link(props: JSX.HTMLAttributes<HTMLElement>) {
+export function Link(props: JSX.HTMLAttributes<HTMLAnchorElement>) {
     return (
         <>
             <span class="text-[#0000EE] text-underline" style="text-underline-offset: 3px; text-decoration-skip-ink: none;">
-                <a href={ `.${ props.href ?? "" }` }>{ props.children }</a>
+                <a { ...props }/>
             </span>
 
             <br/>

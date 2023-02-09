@@ -14,7 +14,7 @@ export default function Call({ url, data }: PageProps) {
                 <title>Demo</title>
             </Head>
 
-            <div class="mt-4 ml-4">
+            <div class="mt-4 ml-4 mb-1">
                 <CallArea id={ data }/>
             </div>
         </>
