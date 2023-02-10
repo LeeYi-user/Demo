@@ -11,7 +11,7 @@ export default function Call({ url, data }: PageProps) {
     return (
         <>
             <Head>
-                <title>Demo</title>
+                <title>李易的視訊通話</title>
             </Head>
 
             <div class="mt-4 ml-4 mb-1">
