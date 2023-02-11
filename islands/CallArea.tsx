@@ -32,6 +32,13 @@ export default function CallArea({ id }: { "id": string })
         setPc(new RTCPeerConnection(ICE_SERVERS));
     }, []);
 
+    useEffect(() => {
+        if (target !== "Random" && peers.indexOf(target) === -1)
+        {
+            setTarget("Random");
+        }
+    }, [peers]);
+
     const startCall = useCallback(async () =>
     {
         let peer: string;
@@ -69,14 +76,10 @@ export default function CallArea({ id }: { "id": string })
                 "data": event.candidate?.toJSON(),
                 "target": peer
             }));
-
-            console.log("send candidate");
         }
 
         const offerDescription = await pc?.createOffer();
         await pc?.setLocalDescription(offerDescription);
-
-        console.log("set local description");
 
         const offer =
         {
@@ -91,8 +94,6 @@ export default function CallArea({ id }: { "id": string })
             "data": offer,
             "target": peer
         }));
-
-        console.log("send offer");
     }, [socket, peers, target]);
 
     useEffect(() =>
@@ -101,6 +102,8 @@ export default function CallArea({ id }: { "id": string })
         {
             return;
         }
+
+        let receiver = false;
 
         localStream.getTracks().forEach((track) =>
         {
@@ -136,13 +139,13 @@ export default function CallArea({ id }: { "id": string })
         {
             const body = JSON.parse(event.data);
 
-            if (body.type === "join" || body.type === "left")
+            if (body.type === "update")
             {
                 setPeers(body.data);
             }
             else if (body.type === "offer")
             {
-                console.log("receive offer");
+                receiver = true;
 
                 setCalling(true);
 
@@ -155,19 +158,13 @@ export default function CallArea({ id }: { "id": string })
                         "data": event.candidate?.toJSON(),
                         "target": body.id
                     }));
-
-                    console.log("send candidate");
                 }
 
                 const offerDescription = new RTCSessionDescription(body.data);
                 pc?.setRemoteDescription(offerDescription);
 
-                console.log("set remote description")
-
                 const answerDescription = await pc?.createAnswer();
                 await pc?.setLocalDescription(answerDescription);
-
-                console.log("set local description");
 
                 const answer =
                 {
@@ -182,26 +179,31 @@ export default function CallArea({ id }: { "id": string })
                     "data": answer,
                     "target": body.id
                 }));
-
-                console.log("send answer");
             }
             else if (body.type === "answer")
             {
-                console.log("receive answer");
+                if (receiver)
+                {
+                    socket.close();
+                    alert("Your target has left.");
+                    location.reload();
+                    return;
+                }
 
                 const answerDescription = new RTCSessionDescription(body.data);
                 pc?.setRemoteDescription(answerDescription);
-
-                console.log("set remote description");
             }
             else if (body.type === "candidate" && body.data)
             {
-                console.log("receive candidate");
-
                 const candidate = new RTCIceCandidate(body.data);
                 pc?.addIceCandidate(candidate);
-
-                console.log("add candidate");
+            }
+            else if (body.type === "kick")
+            {
+                socket.close();
+                alert("Your target has left.");
+                location.reload();
+                return;
             }
         };
 

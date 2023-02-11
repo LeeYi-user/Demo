@@ -1,58 +1,68 @@
 const clients = new Map<WebSocket, string>();
-const calling = new Map<string, WebSocket>();
+const targets = new Map<string, string>();
+
+function update()
+{
+    const body: { "type": string; "data": string[]; } =
+    {
+        "type": "update",
+        "data": []
+    };
+
+    for (const [_socket, id] of clients)
+    {
+        if (!targets.get(id))
+        {
+            body.data.push(id);
+        }
+    }
+
+    for (const [socket, _id] of clients)
+    {
+        socket.send(JSON.stringify(body));
+    }
+}
 
 // deno-lint-ignore no-explicit-any
 function broadcast(socket: WebSocket, body: any)
 {
-    if (body.type === "join" || body.type === "left")
+    if (body.type === "join")
     {
-        if (body.type === "join")
-        {
-            clients.set(socket, body.id);
-        }
-        else
-        {
-            clients.delete(socket);
-        }
-
-        const temp = [];
-
-        for (const [_socket, id] of clients)
-        {
-            temp.push(id);
-        }
-
-        body.data = temp;
-
-        for (const [socket, _id] of clients)
-        {
-            socket.send(JSON.stringify(body));
-        }
+        clients.set(socket, body.id);
+        update();
     }
-    else
+    else if (body.type === "left")
     {
-        if (!calling.has(body.id))
+        for (const [socket_, id] of clients)
         {
-            calling.set(body.id, socket);
-            broadcast(socket, { "type": "left" });
-        }
-
-        if (!calling.has(body.target))
-        {
-            for (const [socket, id] of clients)
+            if (targets.get(id) === clients.get(socket))
             {
-                if (id === body.target)
-                {
-                    calling.set(id, socket);
-                    broadcast(socket, { "type": "left" });
-                    break;
-                }
+                socket_.send(JSON.stringify({ "type": "kick" }));
             }
         }
 
-        for (const [id, socket] of calling)
+        targets.delete(clients.get(socket)!);
+        clients.delete(socket);
+        update();
+    }
+    else
+    {
+        if (!targets.get(body.id))
         {
-            if (id === body.target)
+            if (targets.get(body.target))
+            {
+                socket.send(JSON.stringify({ "type": "kick" }));
+                return;
+            }
+
+            targets.set(body.id, body.target);
+            targets.set(body.target, body.id);
+            update();
+        }
+
+        for (const [socket, id] of clients)
+        {
+            if (id === targets.get(body.id))
             {
                 socket.send(JSON.stringify(body));
                 break;
@@ -72,15 +82,6 @@ export function handler(req: Request) {
     socket.onclose = () =>
     {
         broadcast(socket, { "type": "left" });
-
-        for (const [id, socket_] of calling)
-        {
-            if (socket_ === socket)
-            {
-                calling.delete(id);
-                break;
-            }
-        }
     }
 
     return response;
