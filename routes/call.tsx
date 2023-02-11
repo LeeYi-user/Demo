@@ -14,7 +14,7 @@ export default function Call({ url, data }: PageProps) {
                 <title>李易的視訊通話</title>
             </Head>
 
-            <div class="mt-4 ml-4 mb-1">
+            <div class="m-1">
                 <CallArea id={ data }/>
             </div>
         </>

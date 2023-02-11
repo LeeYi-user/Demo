@@ -214,12 +214,9 @@ export default function CallArea({ id }: { "id": string })
         <div>
             Your ID: { id }
 
-            <div class="mt-1">
-                <video class="border border-black" ref={ localVideo } autoPlay playsInline muted/>
-            </div>
-            
-            <div class="mt-1">
-                <video class="border border-black" ref={ remoteVideo } autoPlay playsInline/>
+            <div class="mt-1 flex flex-col sm:flex-row">
+                <video class="border border-black max-w-[100vw] max-h-[50vh]" ref={ localVideo } autoPlay playsInline muted/>
+                <video class="mt-1 sm:mt-0 sm:ml-1 border border-black max-w-[100vw] max-h-[50vh]" ref={ remoteVideo } autoPlay playsInline/>
             </div>
 
             { calling ? null :
