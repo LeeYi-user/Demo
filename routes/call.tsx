@@ -12,6 +12,7 @@ export default function Call({ url, data }: PageProps) {
         <>
             <Head>
                 <title>李易的視訊通話</title>
+                <link rel="icon" href="/call.png"/>
             </Head>
 
             <div class="m-1">
