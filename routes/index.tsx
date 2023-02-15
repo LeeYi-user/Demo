@@ -11,6 +11,7 @@ export default function Home() {
             <div class="mt-4 ml-4">
                 <Link href="/call">call</Link>
                 <Link href="/chat">chat</Link>
+                <Link href="/game/index.html">game</Link>
                 <Link href="/upload">upload</Link>
                 <Link href="/download">download</Link>
             </div>
