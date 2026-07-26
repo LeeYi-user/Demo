@@ -1,9 +1,9 @@
 import { JSX } from "preact";
 
-export function Link(props: JSX.HTMLAttributes<HTMLAnchorElement>) {
+export function Link(props: JSX.IntrinsicElements["a"]) {
     return (
         <>
-            <span class="text-[#0000EE] text-underline" style="text-underline-offset: 3px; text-decoration-skip-ink: none;">
+            <span class="text-[#0000EE] underline" style="text-underline-offset: 3px; text-decoration-skip-ink: none;">
                 <a { ...props }/>
             </span>
 

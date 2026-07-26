@@ -1,16 +1,10 @@
-import { Head } from "$fresh/runtime.ts";
+import { define } from "../utils.ts";
 import UploadArea from "../islands/UploadArea.tsx";
 
-export default function Upload() {
-    return (
-        <>
-            <Head>
-                <title>Demo</title>
-            </Head>
-
-            <div class="mt-4 ml-4">
-                <UploadArea/>
-            </div>
-        </>
-    );
-}
+export default define.page(function Upload() {
+  return (
+    <div class="mt-4 ml-4">
+      <UploadArea />
+    </div>
+  );
+});

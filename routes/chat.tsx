@@ -1,22 +1,18 @@
-import { HandlerContext, PageProps } from "$fresh/server.ts";
-import { Head } from "$fresh/runtime.ts";
+import { page } from "fresh";
+import { define } from "../utils.ts";
 import ChatArea from "../islands/ChatArea.tsx";
 
-export async function handler(_req: Request, ctx: HandlerContext) {
-    const { hostname } = ctx.remoteAddr as Deno.NetAddr;
-    return await ctx.render(hostname);
-}
+export const handler = define.handlers({
+  GET(ctx) {
+    const { hostname } = ctx.info.remoteAddr as Deno.NetAddr;
+    return page(hostname);
+  },
+});
 
-export default function Chat({ url, data }: PageProps) {
-    return (
-        <>
-            <Head>
-                <title>Demo</title>
-            </Head>
-
-            <div class="mt-4 ml-4">
-                <ChatArea address={ data }/>
-            </div>
-        </>
-    );
-}
+export default define.page<typeof handler>(function Chat({ data }) {
+  return (
+    <div class="mt-4 ml-4">
+      <ChatArea address={data} />
+    </div>
+  );
+});

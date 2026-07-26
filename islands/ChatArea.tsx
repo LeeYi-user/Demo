@@ -1,12 +1,6 @@
 import { useState, useEffect, useRef } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
-
-interface Message
-{
-    "channel": string;
-    "address": string;
-    "content": string;
-}
+import type { Message } from "../lib/types.ts";
 
 export default function ChatArea({ address }: { "address": string }) {
     const channelInput = useRef<HTMLInputElement>(null);

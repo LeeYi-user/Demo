@@ -1,24 +1,32 @@
-import { MongoClient } from "https://deno.land/x/mongo@v0.31.1/mod.ts";
-import "https://deno.land/x/dotenv@v3.2.0/load.ts";
+import { HttpError } from "fresh";
+import { define } from "../../utils.ts";
+import { getDb } from "../../lib/mongo.ts";
+import type { Message } from "../../lib/types.ts";
 
-interface Message
-{
-    "channel": string;
-    "address": string;
-    "content": string;
-}
+export const handler = define.handlers({
+  async POST(ctx) {
+    const body = await ctx.req.json() as Partial<Message>;
 
-const client = new MongoClient();
-await client.connect(Deno.env.get("MONGODB_CONNECTION_URI")!);
-const db = client.database("demo");
+    if (
+      typeof body.channel !== "string" || typeof body.address !== "string" ||
+      typeof body.content !== "string"
+    ) {
+      throw new HttpError(400, "Expected `channel`, `address` and `content`");
+    }
 
-export async function handler(req: Request) {
-    const body = await req.json();
-    const channel = new BroadcastChannel(body.channel);
+    const message: Message = {
+      "channel": body.channel,
+      "address": body.address,
+      "content": body.content,
+    };
 
-    await db.collection<Message>("chat").insertOne(body);
-    channel.postMessage(body);
+    const db = await getDb();
+    await db.collection<Message>("chat").insertOne({ ...message });
+
+    const channel = new BroadcastChannel(message.channel);
+    channel.postMessage(message);
     channel.close();
 
     return new Response("OK");
-}
+  },
+});

@@ -1,22 +1,18 @@
-import { HandlerContext, PageProps } from "$fresh/server.ts";
-import { Head } from "$fresh/runtime.ts";
+import { page } from "fresh";
+import { define } from "../utils.ts";
 import CallArea from "../islands/CallArea.tsx";
 
-export async function handler(_req: Request, ctx: HandlerContext) {
+export const handler = define.handlers({
+  GET() {
     const id = Math.random().toString(36).substring(2, 9);
-    return await ctx.render(id);
-}
+    return page(id);
+  },
+});
 
-export default function Call({ url, data }: PageProps) {
-    return (
-        <>
-            <Head>
-                <title>Demo</title>
-            </Head>
-
-            <div class="m-1">
-                <CallArea id={ data }/>
-            </div>
-        </>
-    );
-}
+export default define.page<typeof handler>(function Call({ data }) {
+  return (
+    <div class="m-1">
+      <CallArea id={data} />
+    </div>
+  );
+});

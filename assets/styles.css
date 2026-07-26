@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Fresh's Vite plugin only scans modules reachable from the client entry.
+   Routes are server-rendered, so point Tailwind at them explicitly. */
+@source "../routes";
+@source "../islands";
+@source "../components";
